@@ -84,5 +84,10 @@
         /// Лист с ручкой
         /// </summary>
         public const string Memo = "📝";
+
+        /// <summary>
+        /// Глаза
+        /// </summary>
+        public const string Eyes = "👀";
     }
 }

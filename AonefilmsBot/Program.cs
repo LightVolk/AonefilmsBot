@@ -8,9 +8,12 @@ namespace AonefilmsBot
         {
             var service = new AonefilmsBotService();
 
-            service.Start();
+            service.OnStart();
+
             Console.WriteLine("Press any key to exit");
-            Console.ReadKey();       
+            Console.ReadKey();
+       
+            service.OnStop();   
         }
     }
 }
