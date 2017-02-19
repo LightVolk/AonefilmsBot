@@ -89,5 +89,9 @@
         /// Глаза
         /// </summary>
         public const string Eyes = "👀";
+
+
+        /// </summary>
+        public const string Victory = "✌";
     }
 }
