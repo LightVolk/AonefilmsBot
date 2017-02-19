@@ -6,6 +6,7 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace AonefilmsBot
 {
+    using System.Threading.Tasks;
     using CommandHandler = Action<User, string>;
 
     /// <summary>
@@ -44,6 +45,8 @@ namespace AonefilmsBot
         // Получение собщения.
         private void BotOnMessageReceived(object sender, Telegram.Bot.Args.MessageEventArgs e)
         {
+            Logger.LogMessage($"{ e.Message.From.Id } { e.Message.From.FirstName } { e.Message.From.LastName } { e.Message.Text }");
+
             User user = new User
             {
                 ChatId = e.Message.Chat.Id,
@@ -54,7 +57,7 @@ namespace AonefilmsBot
                 Username = e.Message.From.Username
             };
 
-           if(e.Message.Type == MessageType.TextMessage)
+            if(e.Message.Type == MessageType.TextMessage)
                 ProcessTextCommand(user);
         }
 
@@ -125,11 +128,25 @@ namespace AonefilmsBot
         /// </summary>
         /// <param name="chatId">Id чата.</param>
         /// <param name="photo">Ссылка на изображение.</param>
-        public async void SendImage(long chatId, string photoLink, IReplyMarkup button = null, ParseMode parseMode = ParseMode.Default)
-        {       
+        public async void SendImage(long chatId, string photoLink, IReplyMarkup button = null)
+        {
+            await Task.Delay(500);
+
             await this.bot.SendChatActionAsync(chatId, ChatAction.UploadPhoto);
 
             await this.bot.SendPhotoAsync(chatId, new FileToSend(photoLink), replyMarkup: button);
+        }
+
+        /// <summary>
+        /// Отправить стикер.
+        /// </summary>
+        /// <param name="chatId">Id чата.</param>
+        /// <param name="photo">Ссылка на изображение.</param>
+        public async void SendSticker(long chatId, string photoLink, IReplyMarkup button = null, ParseMode parseMode = ParseMode.Default)
+        {
+            await this.bot.SendChatActionAsync(chatId, ChatAction.Typing);
+
+            await this.bot.SendStickerAsync(chatId, new FileToSend(photoLink));
         }
     }
 }

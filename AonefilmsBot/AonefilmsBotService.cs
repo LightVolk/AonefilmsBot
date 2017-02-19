@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Telegram.Bot.Types.Enums;
 
 namespace AonefilmsBot
@@ -38,6 +39,8 @@ namespace AonefilmsBot
                 // Загрузить конфигурацию бота.
                 Config.Load();
 
+                Logger.Initialize();
+
                 bot = new AonefilmsBot();
 
                 // Добавление делегатов.
@@ -54,18 +57,19 @@ namespace AonefilmsBot
                 bot.AddCommandHandler(SendNext, nextbest);
                 bot.AddCommandHandler(SendAll, all);
                 bot.AddCommandHandler(SendMenu, menu);
-                bot.AddCommandHandler(SendStart, dolan);
-                bot.AddCommandHandler(SendStart, dano);
+                bot.AddCommandHandler(SendDolan, dolan);
+                bot.AddCommandHandler(SendDano, dano);
                 bot.AddCommandHandler(SendStickers, stickers);
-                             
+
                 // Начать прием сообщений.
                 bot.Start();
 
-                Console.WriteLine($"Бот запущен.");
+                Logger.LogMessage($"Stariting {bot.BotUsermame}");
             }
             catch(Exception exc)
             {
-                Console.WriteLine($"Ошибка запуска бота. { exc }");
+                Logger.LogError($"Ошибка запуска бота. {exc.ToString()}");
+
                 throw;
             }
         }
@@ -75,7 +79,7 @@ namespace AonefilmsBot
         /// </summary>
         public void OnStop()
         {
-            Console.WriteLine($"Бот остановлен.");
+            Logger.LogMessage($"Бот остановлен.");
         }
 
         // Старт.
@@ -86,7 +90,7 @@ namespace AonefilmsBot
 
             string description = "Мы выбираем лучшие фильмы на крупнейших кинофестивалях и привозим их в Россию.\n\n" +
 
-                "Здесь мы собрали для тебя всю полезную и интересную информацию о наших проектах.\n\n" +
+                $"Здесь мы собрали для тебя всю полезную и интересную информацию о наших проектах.\n\n" +
 
                 $"Готов? Поехали! { Emoji.Victory }";
 
@@ -118,7 +122,9 @@ namespace AonefilmsBot
         // Новости.
         private void SendNews(User user, string commmand)
         {
-            string description = $"🍩 Участвуем в <a href=\"https://vk.com/patersonmovie?w=wall-134715766_308\" >розыгрыше черно-белых призов</a> по фильму «Патерсон» Джима Джармуша!\n\n24 февраля Антон Долин приедет в Питер, чтобы представить свою книгу о Джиме Джармуше! Скоро сообщим подробности 😉";
+            string description = $"🍩 Участвуем в <a href=\"https://vk.com/patersonmovie?w=wall-134715766_308\">розыгрыше черно-белых призов</a> по фильму «Патерсон» Джима Джармуша!\n\n" +
+
+                $"{ Emoji.Victory} 24 февраля Антон Долин приедет в Питер, чтобы представить свою книгу о Джиме Джармуше! Скоро сообщим подробности.";
 
             bot.SendText(user.ChatId, description, parseMode: ParseMode.Html, disableWebPagePreview: true);
 
@@ -154,13 +160,13 @@ namespace AonefilmsBot
         {
             string description = "Получай необходимую информацию с помощью расположенных ниже клавиш с командами\n\n" +
 
-                "Также ты подписан на рассылку горячих новостей и информации о мероприятиях. Отписаться можно командой /unsubscribe, но если станет скучно -верни командой /subscribe 🤗\n\n" +
+                $"Также ты подписан на рассылку горячих новостей и информации о мероприятиях. Отписаться можно командой /unsubscribe, но если станет скучно -верни командой /subscribe 🤗\n\n" +
 
-                "Мы в ВК: vk.com/a_onefilms\n" +
+                $"Мы в ВК: vk.com/a_onefilms\n" +
 
-                "Мы в Instagram: instagram.com/aonefilms\n\n" +
+                $"Мы в Instagram: instagram.com/aonefilms\n\n" +
 
-                "🆘 Если в работе бота есть ошибка или возникла проблема, пиши сюда: @VikaLymar";
+                $"🆘 Если в работе бота есть ошибка или возникла проблема, пиши сюда: @VikaLymar";
 
             bot.SendText(user.ChatId, description, disableWebPagePreview: true);
         }
@@ -190,7 +196,7 @@ namespace AonefilmsBot
             Random rnd = new Random();
 
             // Отправить случайный стикер и список стикеров.
-            bot.SendImage(user.ChatId, stickerId[rnd.Next(0, 5)]);
+            bot.SendSticker(user.ChatId, stickerId[rnd.Next(0, 5)]);
 
             string description = $"<a href=\"https://telegram.me/addstickers/benechka\">💙 Беня Камбербэтчик</a>\n" +
 
@@ -221,22 +227,6 @@ namespace AonefilmsBot
             bot.SendText(user.ChatId, description, Button.inlineNextRandom, ParseMode.Html);
         }
 
-        //// Следующий случайный фильм.
-        //private void SendNextRandom(User user, string commmand)
-        //{
-        //    Random rnd = new Random();
-
-        //    // Count - номер случайной строки в Random.txt; Line - случайная строка.
-        //    Int32 count = System.IO.File.ReadAllLines(Config.randomFilmFile).Count();
-
-        //    string[] line = System.IO.File.ReadAllLines(Config.randomFilmFile)[rnd.Next(0, count)].Split('@');
-
-        //    // Отправить следующий случайный фильм.
-        //    string description = $"<a href=\"{ line[0] }\">{ line[1] }</a>\n\n";
-
-        //    bot.EditText(user.ChatId, user.MessageId, description, Button.inlineNextRandom, parseMode: ParseMode.Html);
-        //}
-
         // 5 лучших.
         private void SendBest(User user, string commmand)
         {
@@ -257,8 +247,6 @@ namespace AonefilmsBot
             // Count - номер случайной строки в Random.txt; Line - случайная строка.
             Int32 count = System.IO.File.ReadAllLines(Config.botConfigPath + commmand).Count();
 
-            Console.WriteLine(Config.botConfigPath + commmand);
-
             string[] line = System.IO.File.ReadAllLines(Config.randomFilmFile)[rnd.Next(0, count)].Split('@');
 
             // Отправить следующий случайный фильм.
@@ -268,6 +256,22 @@ namespace AonefilmsBot
                 bot.EditText(user.ChatId, user.MessageId, description, Button.inlineNextBestFilm, parseMode: ParseMode.Html);
             else
                 bot.EditText(user.ChatId, user.MessageId, description, Button.inlineNextRandom, parseMode: ParseMode.Html);
+        }
+
+        // Долан.
+        private void SendDolan(User user, string commmand)
+        {
+            string description = "Кнопка в ремонте.";
+
+            bot.SendText(user.ChatId, description);
+        }
+
+        // Дано.
+        private void SendDano(User user, string commmand)
+        {
+            string description = "Кнопка в ремонте.";
+
+            bot.SendText(user.ChatId, description);
         }
     }
 }
