@@ -25,7 +25,8 @@ namespace AonefilmsBot
         private const string dolan = "💘 Доланчик";
         private const string dano = "💓 Дано";
         private const string stickers = "👻 Cтикеры";
-        private const string nextrandom = "Следующий рандомный";
+        private const string nextrandom = "Random.txt";
+        private const string nextbest = "TheBest.txt";
 
         /// <summary>
         /// Запустить службу.
@@ -48,15 +49,15 @@ namespace AonefilmsBot
                 bot.AddCommandHandler(SendPictures, pictures);
                 bot.AddCommandHandler(SendHelp, help);
                 bot.AddCommandHandler(SendBest, best);
+                bot.AddCommandHandler(SendNext, nextrandom);
                 bot.AddCommandHandler(SendRandom, random);
+                bot.AddCommandHandler(SendNext, nextbest);
                 bot.AddCommandHandler(SendAll, all);
                 bot.AddCommandHandler(SendMenu, menu);
                 bot.AddCommandHandler(SendStart, dolan);
                 bot.AddCommandHandler(SendStart, dano);
                 bot.AddCommandHandler(SendStickers, stickers);
-                bot.AddCommandHandler(SendStickers, stickers);
-                bot.AddCommandHandler(SendNextRandom, nextrandom);
-
+                             
                 // Начать прием сообщений.
                 bot.Start();
 
@@ -192,9 +193,13 @@ namespace AonefilmsBot
             bot.SendImage(user.ChatId, stickerId[rnd.Next(0, 5)]);
 
             string description = $"<a href=\"https://telegram.me/addstickers/benechka\">💙 Беня Камбербэтчик</a>\n" +
+
                 "<a href=\"https://telegram.me/addstickers/makovochka\">💚 Джеймс Маковочка</a>\n" +
+
                 "<a href=\"https://telegram.me/addstickers/fassenka\">💛 Майкл Фасси Фассбендерчик</a>\n" +
+
                 "<a href=\"https://telegram.me/addstickers/garrelik\">💜 Типичный Гаррелюшка</a>\n" +
+
                 "<a href=\"https://telegram.me/addstickers/danopirozhok\">❤ Пирожочек Дано</a>";
 
             bot.SendText(user.ChatId, description, parseMode: ParseMode.Html);
@@ -216,6 +221,22 @@ namespace AonefilmsBot
             bot.SendText(user.ChatId, description, Button.inlineNextRandom, ParseMode.Html);
         }
 
+        //// Следующий случайный фильм.
+        //private void SendNextRandom(User user, string commmand)
+        //{
+        //    Random rnd = new Random();
+
+        //    // Count - номер случайной строки в Random.txt; Line - случайная строка.
+        //    Int32 count = System.IO.File.ReadAllLines(Config.randomFilmFile).Count();
+
+        //    string[] line = System.IO.File.ReadAllLines(Config.randomFilmFile)[rnd.Next(0, count)].Split('@');
+
+        //    // Отправить следующий случайный фильм.
+        //    string description = $"<a href=\"{ line[0] }\">{ line[1] }</a>\n\n";
+
+        //    bot.EditText(user.ChatId, user.MessageId, description, Button.inlineNextRandom, parseMode: ParseMode.Html);
+        //}
+
         // 5 лучших.
         private void SendBest(User user, string commmand)
         {
@@ -228,20 +249,25 @@ namespace AonefilmsBot
             bot.SendText(user.ChatId, description, Button.inlineNextBestFilm, ParseMode.Html);
         }
 
-        // Следующий случайный фильм.
-        private void SendNextRandom(User user, string commmand)
-        {        
+        // Следующий случайный или лучший фильм.
+        private void SendNext(User user, string commmand)
+        {
             Random rnd = new Random();
 
             // Count - номер случайной строки в Random.txt; Line - случайная строка.
-            Int32 count = System.IO.File.ReadAllLines(Config.randomFilmFile).Count();
+            Int32 count = System.IO.File.ReadAllLines(Config.botConfigPath + commmand).Count();
+
+            Console.WriteLine(Config.botConfigPath + commmand);
 
             string[] line = System.IO.File.ReadAllLines(Config.randomFilmFile)[rnd.Next(0, count)].Split('@');
-    
+
             // Отправить следующий случайный фильм.
             string description = $"<a href=\"{ line[0] }\">{ line[1] }</a>\n\n";
 
-            bot.EditText(user.ChatId, user.MessageId, description, Button.inlineNextRandom, parseMode: ParseMode.Html);
+            if(String.Equals(commmand, "TheBest.txt"))
+                bot.EditText(user.ChatId, user.MessageId, description, Button.inlineNextBestFilm, parseMode: ParseMode.Html);
+            else
+                bot.EditText(user.ChatId, user.MessageId, description, Button.inlineNextRandom, parseMode: ParseMode.Html);
         }
     }
 }

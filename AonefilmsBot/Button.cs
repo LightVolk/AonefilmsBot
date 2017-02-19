@@ -34,13 +34,6 @@ namespace AonefilmsBot
         }, resizeKeyboard: true);
 
         /// <summary>
-        /// Inline переключение случайных фильмов
-        /// </summary>
-        public static InlineKeyboardMarkup inlineNextRandom = new InlineKeyboardMarkup(new[] {
-                new[] { new InlineKeyboardButton("Следующий фильм →", "Следующий рандомный") }
-        });
-
-        /// <summary>
         /// Inline покупка билета в кинотеатре.
         /// </summary>
         public static InlineKeyboardMarkup inlineBuy = new InlineKeyboardMarkup(new[] {
@@ -63,7 +56,14 @@ namespace AonefilmsBot
         /// Inline переключение лучших фильмов.
         /// </summary>
         public static InlineKeyboardMarkup inlineNextBestFilm = new InlineKeyboardMarkup(new[] {
-            new[] { new InlineKeyboardButton("Следующий →", "1") }
+            new[] { new InlineKeyboardButton("Следующий →", "TheBest.txt") }
+        });
+
+        /// <summary>
+        /// Inline переключение случайных фильмов
+        /// </summary>
+        public static InlineKeyboardMarkup inlineNextRandom = new InlineKeyboardMarkup(new[] {
+                new[] { new InlineKeyboardButton("Следующий фильм →", "Random.txt") }
         });
     }
 }

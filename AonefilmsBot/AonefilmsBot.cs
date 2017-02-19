@@ -113,11 +113,11 @@ namespace AonefilmsBot
         /// Отредактировать сообщение.
         /// </summary>
         /// <param name="chatId">Id чата.</param>
-        /// /// <param name="messageid">Id сообщения.</param>
+        /// <param name="messageid">Id сообщения.</param>
         /// <param name="message">Текст сообщения.</param>
-        public async void EditText(long chatId, int messageid, string message, IReplyMarkup button = null, ParseMode parseMode = ParseMode.Default, bool disableWebPagePreview = false)
+        public void EditText(long chatId, int messageid, string message, IReplyMarkup button = null, ParseMode parseMode = ParseMode.Default, bool disableWebPagePreview = false)
         {
-            await this.bot.EditMessageTextAsync(chatId, messageid, message, replyMarkup: button, parseMode: parseMode, disableWebPagePreview: disableWebPagePreview);
+            bot.EditMessageTextAsync(chatId, messageid, message, replyMarkup: button, parseMode: parseMode, disableWebPagePreview: disableWebPagePreview);
         }
 
         /// <summary>

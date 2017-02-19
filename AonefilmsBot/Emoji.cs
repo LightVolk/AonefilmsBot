@@ -6,37 +6,37 @@
     static class Emoji
     {
         /// <summary>
-        /// SOS
+        /// SOS.
         /// </summary>
         public const string Sos = "🆘";
 
         /// <summary>
-        /// 5 лучших
+        /// 5 лучших.
         /// </summary>
         public const string TopArrow = "🔝";
 
         /// <summary>
-        /// Бикини
+        /// Бикини.
         /// </summary>
         public const string Bikini = "👙";
 
         /// <summary>
-        /// Все фильмы
+        /// Все фильмы.
         /// </summary>
         public const string PageFacingUp = "📄";
 
         /// <summary>
-        /// Выбери команду
+        /// Выбери команду.
         /// </summary>
         public const string HandDown = "👇";
 
         /// <summary>
-        /// Картиночки
+        /// Картиночки.
         /// </summary>
         public const string ArtistPalette = "🎨";
 
         /// <summary>
-        /// Меню
+        /// Меню.
         /// </summary>
         public const string ArrowCurving = "↩";
 
@@ -46,51 +46,52 @@
         public const string Megaphone = "📣";
 
         /// <summary>
-        /// Подмигивание
+        /// Подмигивание.
         /// </summary>
         public const string WinkingFace = "😉";
 
         /// <summary>
-        /// Помощь
+        /// Помощь.
         /// </summary>
         public const string Question = "❓";
 
         /// <summary>
-        /// Сейчас в кино
+        /// Сейчас в кино.
         /// </summary>
         public const string ClapperBoard = "🎬";
 
         /// <summary>
-        /// Скоро в кино
+        /// Скоро в кино.
         /// </summary>
         public const string Soon = "🔜";
 
         /// <summary>
-        /// Случайный
+        /// Случайный.
         /// </summary>
         public const string MagnifyingGlass = "🔎";
 
         /// <summary>
-        /// Танцующая девушка
+        /// Танцующая девушка.
         /// </summary>
         public const string WomanDancing = "💃";
 
         /// <summary>
-        /// Фильмы online
+        /// Фильмы online.
         /// </summary>
         public const string MobileWithArrow = "📲";
 
         /// <summary>
-        /// Лист с ручкой
+        /// Лист с ручкой.
         /// </summary>
         public const string Memo = "📝";
 
         /// <summary>
-        /// Глаза
+        /// Глаза.
         /// </summary>
         public const string Eyes = "👀";
 
-
+        /// <summary>
+        /// Виктори.
         /// </summary>
         public const string Victory = "✌";
     }
