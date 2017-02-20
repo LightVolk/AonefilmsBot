@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Types.ReplyMarkups;
 
 namespace AonefilmsBot
 {
@@ -43,6 +45,8 @@ namespace AonefilmsBot
 
                 bot = new AonefilmsBot();
 
+                Int16 counter = 0;
+
                 // Добавление делегатов.
                 bot.AddCommandHandler(SendStart, start);
                 bot.AddCommandHandler(SendNow, now);
@@ -52,14 +56,15 @@ namespace AonefilmsBot
                 bot.AddCommandHandler(SendPictures, pictures);
                 bot.AddCommandHandler(SendHelp, help);
                 bot.AddCommandHandler(SendBest, best);
-                bot.AddCommandHandler(SendNext, nextrandom);
                 bot.AddCommandHandler(SendRandom, random);
-                bot.AddCommandHandler(SendNext, nextbest);
                 bot.AddCommandHandler(SendAll, all);
                 bot.AddCommandHandler(SendMenu, menu);
-                bot.AddCommandHandler(SendDolan, dolan);
-                bot.AddCommandHandler(SendDano, dano);
                 bot.AddCommandHandler(SendStickers, stickers);
+
+                bot.AddCounterHandler(SendNext, nextbest, counter);
+                bot.AddCounterHandler(SendNext, nextrandom, counter);
+                bot.AddCounterHandler(SendDano, dano, counter);
+                bot.AddCounterHandler(SendDolan, dolan, counter);
 
                 // Начать прием сообщений.
                 bot.Start();
@@ -240,26 +245,50 @@ namespace AonefilmsBot
         }
 
         // Следующий случайный или лучший фильм.
-        private void SendNext(User user, string commmand)
+        private void SendNext(User user, string filename, Int16 counter)
         {
             Random rnd = new Random();
 
-            // Count - номер случайной строки в Random.txt; Line - случайная строка.
-            Int32 count = System.IO.File.ReadAllLines(Config.botConfigPath + commmand).Count();
+            if(String.Equals(filename, "TheBest.txt"))
+            {
+                // Обнуление фильмов
+                if(counter == System.IO.File.ReadAllLines(Config.botConfigPath + filename).Count())
+                    counter = 0;
+                    
+                string[] line = System.IO.File.ReadAllLines(Config.botConfigPath + filename)[counter].Split('@');
 
-            string[] line = System.IO.File.ReadAllLines(Config.randomFilmFile)[rnd.Next(0, count)].Split('@');
+                Console.WriteLine("Отправлен фильм №: " + counter);
 
-            // Отправить следующий случайный фильм.
-            string description = $"<a href=\"{ line[0] }\">{ line[1] }</a>\n\n";
+                counter++;
 
-            if(String.Equals(commmand, "TheBest.txt"))
-                bot.EditText(user.ChatId, user.MessageId, description, Button.inlineNextBestFilm, parseMode: ParseMode.Html);
+                InlineKeyboardMarkup inlineNextBestFilm = new InlineKeyboardMarkup(new[] {
+                    new[] { new InlineKeyboardButton("Следующий →", "TheBest.txt@" + counter) }
+                    });
+
+                // Отправить следующий случайный фильм.
+                string description = $"<a href=\"{ line[0] }\">{ line[1] }</a>\n\n";
+
+                bot.EditText(user.ChatId, user.MessageId, description, inlineNextBestFilm, parseMode: ParseMode.Html);
+            }
             else
+            {
+                // Count - номер случайной строки в Random.txt; Line - случайная строка.
+                Int32 count = System.IO.File.ReadAllLines(Config.botConfigPath + filename).Count();
+
+                string[] line = System.IO.File.ReadAllLines(Config.botConfigPath + filename)[rnd.Next(0, count)].Split('@');
+
+                // Отправить следующий случайный фильм.
+                string description = $"<a href=\"{ line[0] }\">{ line[1] }</a>\n\n";
+
+
+
                 bot.EditText(user.ChatId, user.MessageId, description, Button.inlineNextRandom, parseMode: ParseMode.Html);
+            }
         }
 
+
         // Долан.
-        private void SendDolan(User user, string commmand)
+        private void SendDolan(User user, string commmand, Int16 counter)
         {
             string description = "Кнопка в ремонте.";
 
@@ -267,7 +296,7 @@ namespace AonefilmsBot
         }
 
         // Дано.
-        private void SendDano(User user, string commmand)
+        private void SendDano(User user, string commmand, Int16 counter)
         {
             string description = "Кнопка в ремонте.";
 

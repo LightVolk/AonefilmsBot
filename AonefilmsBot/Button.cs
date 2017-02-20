@@ -56,14 +56,14 @@ namespace AonefilmsBot
         /// Inline переключение лучших фильмов.
         /// </summary>
         public static InlineKeyboardMarkup inlineNextBestFilm = new InlineKeyboardMarkup(new[] {
-            new[] { new InlineKeyboardButton("Следующий →", "TheBest.txt") }
+            new[] { new InlineKeyboardButton("Следующий →", "TheBest.txt@0") }
         });
 
         /// <summary>
         /// Inline переключение случайных фильмов
         /// </summary>
         public static InlineKeyboardMarkup inlineNextRandom = new InlineKeyboardMarkup(new[] {
-                new[] { new InlineKeyboardButton("Следующий фильм →", "Random.txt") }
+                new[] { new InlineKeyboardButton("Следующий фильм →", "Random.txt@0") }
         });
     }
 }

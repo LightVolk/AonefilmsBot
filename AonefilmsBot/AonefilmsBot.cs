@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
+using System.Threading.Tasks;
 
 namespace AonefilmsBot
-{
-    using System.Threading.Tasks;
+{ 
     using CommandHandler = Action<User, string>;
+
+    using CounterHandler = Action<User, string, Int16>;
 
     /// <summary>
 	/// Реализация механизма бота.
@@ -17,6 +19,8 @@ namespace AonefilmsBot
         private Telegram.Bot.TelegramBotClient bot;
 
         private Dictionary<string, CommandHandler> commandHandlers = new Dictionary<string, CommandHandler>();
+
+        private Dictionary<string, CounterHandler> counterHandlers = new Dictionary<string, CounterHandler>();
 
         /// <summary>
         /// Username бота.
@@ -61,6 +65,15 @@ namespace AonefilmsBot
                 ProcessTextCommand(user);
         }
 
+        // Обработать сообщение.
+        private void ProcessTextCommand(User user)
+        {
+            CommandHandler handler;
+
+            if(this.commandHandlers.TryGetValue(user.Message, out handler))
+                handler(user, user.Message);
+        }
+
         // Получение inline.
         private void BotOnInlineQueryReceived(object sender, Telegram.Bot.Args.CallbackQueryEventArgs e)
         {
@@ -75,29 +88,51 @@ namespace AonefilmsBot
                 Username = e.CallbackQuery.Message.From.Username
             };
 
-            CommandHandler handler;
+            // Проверка является ли inline переключаемым.
+            if(e.CallbackQuery.Data.Contains("@"))
+            {
+                Console.WriteLine("Yes");
 
-            if(this.commandHandlers.TryGetValue(e.CallbackQuery.Data, out handler))
-                handler(user, e.CallbackQuery.Data);
-        }
+                CounterHandler handler;
 
-        // Обработать сообщение.
-        private void ProcessTextCommand(User user)
-        {
-            CommandHandler handler;
+                string[] split = e.CallbackQuery.Data.Split('@');
 
-            if(this.commandHandlers.TryGetValue(user.Message, out handler))
-                handler(user, user.Message);
+                var data = split[0];
+
+                var count = Int16.Parse(split[1]);
+
+                Console.WriteLine(data + " " + count);
+
+                if(this.counterHandlers.TryGetValue(data, out handler))
+                    handler(user, data, count);
+            }
+            else
+            {
+                CommandHandler handler;
+
+                if(this.commandHandlers.TryGetValue(e.CallbackQuery.Data, out handler))
+                    handler(user, e.CallbackQuery.Data);
+            }
         }
 
         /// <summary>
-        /// Добавить новый делегат для команды.
+        /// Добавить делегат в словарь.
         /// </summary>
         /// <param name="handler">Имя метода.</param>
         /// <param name="commandName">Команда.</param>
         public void AddCommandHandler(CommandHandler handler, string commandName)
         {
                 this.commandHandlers[commandName] = handler;       
+        }
+
+        /// <summary>
+        /// Добавить делегат переключателя в словарь.
+        /// </summary>
+        /// <param name="handler">Имя метода.</param>
+        /// <param name="commandName">Команда.</param>
+        public void AddCounterHandler(CounterHandler handler, string commandName, Int16 counter)
+        {
+            this.counterHandlers[commandName] = handler;
         }
 
         /// <summary>
