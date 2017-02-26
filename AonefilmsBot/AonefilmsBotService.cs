@@ -30,6 +30,7 @@ namespace AonefilmsBot
         private const string stickers = "👻 Cтикеры";
         private const string nextrandom = "Random.txt";
         private const string nextbest = "TheBest.txt";
+        private const string nextDano = "Dano.txt";
 
         /// <summary>
         /// Запустить службу.
@@ -38,10 +39,14 @@ namespace AonefilmsBot
         {
             try
             {
-                // Загрузить конфигурацию бота.
+                Logger.Initialize();
+
+                Logger.LogMessage($"Логирование запущено.\n");
+
                 Config.Load();
 
-                Logger.Initialize();
+                Logger.LogMessage($"Конфигурация загружена.\n");
+
 
                 bot = new AonefilmsBot();
 
@@ -60,16 +65,18 @@ namespace AonefilmsBot
                 bot.AddCommandHandler(SendAll, all);
                 bot.AddCommandHandler(SendMenu, menu);
                 bot.AddCommandHandler(SendStickers, stickers);
+                bot.AddCommandHandler(SendDano, dano);
+                bot.AddCommandHandler(SendDolan, dolan);
 
                 bot.AddCounterHandler(SendNext, nextbest, counter);
-                bot.AddCounterHandler(SendNext, nextrandom, counter);
-                bot.AddCounterHandler(SendDano, dano, counter);
-                bot.AddCounterHandler(SendDolan, dolan, counter);
+                bot.AddCounterHandler(SendNextRandom, nextrandom, counter);
+                bot.AddCounterHandler(SendNext, nextDano, counter);
+
 
                 // Начать прием сообщений.
                 bot.Start();
 
-                Logger.LogMessage($"Stariting {bot.BotUsermame}");
+                Logger.LogMessage($"Запуск бота {bot.BotUsermame}\n");
             }
             catch(Exception exc)
             {
@@ -127,15 +134,9 @@ namespace AonefilmsBot
         // Новости.
         private void SendNews(User user, string commmand)
         {
-            string description = $"🍩 Участвуем в <a href=\"https://vk.com/patersonmovie?w=wall-134715766_308\">розыгрыше черно-белых призов</a> по фильму «Патерсон» Джима Джармуша!\n\n" +
-
-                $"{ Emoji.Victory} 24 февраля Антон Долин приедет в Питер, чтобы представить свою книгу о Джиме Джармуше! Скоро сообщим подробности.";
-
-            bot.SendText(user.ChatId, description, parseMode: ParseMode.Html, disableWebPagePreview: true);
-
-            string photoLink = "AgADAgAD3qcxGw3aMEmPKbJwJ38hxLBKtw0ABKaJKUwMrxNaPjkAAgI";
-
-            bot.SendImage(user.ChatId, photoLink);
+            string description = $"🍩 Участвуем в <a href=\"https://vk.com/patersonmovie?w=wall-134715766_308\">розыгрыше черно-белых призов</a> по фильму «Патерсон» Джима Джармуша!";
+            
+            bot.SendText(user.ChatId, description, parseMode: ParseMode.Html);
         }
 
         // Скоро в кино.
@@ -232,6 +233,22 @@ namespace AonefilmsBot
             bot.SendText(user.ChatId, description, Button.inlineNextRandom, ParseMode.Html);
         }
 
+        // // Следующий случайный фильм
+        private void SendNextRandom(User user, string filename, Int16 counter)
+        {
+            Random rnd = new Random();
+
+            // Count - номер случайной строки в Random.txt; Line - случайная строка.
+            Int32 count = System.IO.File.ReadAllLines(Config.botConfigPath + filename).Count();
+
+            string[] line = System.IO.File.ReadAllLines(Config.botConfigPath + filename)[rnd.Next(0, count)].Split('@');
+
+            // Отправить следующий случайный фильм.
+            string description = $"<a href=\"{ line[0] }\">{ line[1] }</a>\n\n";
+
+            bot.EditText(user.ChatId, user.MessageId, description, Button.inlineNextRandom, parseMode: ParseMode.Html);
+        }
+
         // 5 лучших.
         private void SendBest(User user, string commmand)
         {
@@ -239,56 +256,44 @@ namespace AonefilmsBot
             string[] line = System.IO.File.ReadAllLines(Config.bestFilmFile)[0].Split('@');
 
             // Отправить лучший фильм.
-            string description = $"<a href=\"{ line[0] }\">{ line[1] }</a> { line[2] }\n\n";
+            string description = $"<a href=\"{ line[0] }\">{ line[1] }</a>\n\n";
 
             bot.SendText(user.ChatId, description, Button.inlineNextBestFilm, ParseMode.Html);
         }
 
-        // Следующий случайный или лучший фильм.
+        // Следующий лучший фильм или герой.
         private void SendNext(User user, string filename, Int16 counter)
         {
             Random rnd = new Random();
 
-            if(String.Equals(filename, "TheBest.txt"))
-            {
-                // Обнуление фильмов
-                if(counter == System.IO.File.ReadAllLines(Config.botConfigPath + filename).Count())
-                    counter = 0;
-                    
-                string[] line = System.IO.File.ReadAllLines(Config.botConfigPath + filename)[counter].Split('@');
+            counter++;
 
-                Console.WriteLine("Отправлен фильм №: " + counter);
+            // Обнулить счетчик.
+            if(counter == System.IO.File.ReadAllLines(Config.botConfigPath + filename).Count())
+                counter = 0;
 
-                counter++;
+            if(counter == 5 && filename == "Dano.txt")
+                bot.SendAudio(user.ChatId, "BQADAgADQgADTFeFEZP9nIkSDkS7Ag", 93 , "Paul Dano","God Only Knows");
 
-                InlineKeyboardMarkup inlineNextBestFilm = new InlineKeyboardMarkup(new[] {
-                    new[] { new InlineKeyboardButton("Следующий →", "TheBest.txt@" + counter) }
+            string[] line = System.IO.File.ReadAllLines(Config.botConfigPath + filename)[counter].Split('@');
+
+            InlineKeyboardMarkup inlineNextBestFilm = new InlineKeyboardMarkup(new[] {
+                    new[] { new InlineKeyboardButton("Следующий →", filename + "@" + counter) }
                     });
 
-                // Отправить следующий случайный фильм.
-                string description = $"<a href=\"{ line[0] }\">{ line[1] }</a>\n\n";
+            string description;
 
-                bot.EditText(user.ChatId, user.MessageId, description, inlineNextBestFilm, parseMode: ParseMode.Html);
-            }
+            // Отображение записи.
+            if(filename.Contains("Dano") || filename.Contains("Dolan") || filename.Contains("Paterson"))
+                 description = $"{ line[1] }\n\n<a href=\"{ line[0] }\">\U000000A0</a>\n\n";
             else
-            {
-                // Count - номер случайной строки в Random.txt; Line - случайная строка.
-                Int32 count = System.IO.File.ReadAllLines(Config.botConfigPath + filename).Count();
+                description = $" <a href=\"{ line[0] }\">{ line[1] }</a>\n\n";
 
-                string[] line = System.IO.File.ReadAllLines(Config.botConfigPath + filename)[rnd.Next(0, count)].Split('@');
-
-                // Отправить следующий случайный фильм.
-                string description = $"<a href=\"{ line[0] }\">{ line[1] }</a>\n\n";
-
-
-
-                bot.EditText(user.ChatId, user.MessageId, description, Button.inlineNextRandom, parseMode: ParseMode.Html);
-            }
+            bot.EditText(user.ChatId, user.MessageId, description, inlineNextBestFilm, parseMode: ParseMode.Html);
         }
 
-
         // Долан.
-        private void SendDolan(User user, string commmand, Int16 counter)
+        private void SendDolan(User user, string commmand)
         {
             string description = "Кнопка в ремонте.";
 
@@ -296,11 +301,15 @@ namespace AonefilmsBot
         }
 
         // Дано.
-        private void SendDano(User user, string commmand, Int16 counter)
+        private void SendDano(User user, string commmand)
         {
-            string description = "Кнопка в ремонте.";
+            // Line - случайная строка.
+            string[] line = System.IO.File.ReadAllLines(Config.DanoFile)[0].Split('@');
 
-            bot.SendText(user.ChatId, description);
+            // Отправить лучший фильм.
+            string description = $"{ line[1] }\n\n<a href=\"{ line[0] }\">\U000000A0</a>\n\n";
+
+            bot.SendText(user.ChatId, description, Button.inlineDano, ParseMode.Html);
         }
     }
 }

@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace AonefilmsBot
 {
@@ -21,11 +18,13 @@ namespace AonefilmsBot
     /// </summary>
     static class Logger
     {
-        private static string LogFileName = Environment.ExpandEnvironmentVariables(@"%ALLUSERSPROFILE%\AonefilmsBot\Logs\Logs.txt");
+        private static string logFilePath;
 
         public static void Initialize()
         {
-            Directory.CreateDirectory(Path.GetDirectoryName(LogFileName));
+            logFilePath = Environment.ExpandEnvironmentVariables($@"%ALLUSERSPROFILE%\AonefilmsBot\Logs\{ DateTime.Today.ToShortDateString() }.log");
+
+            Directory.CreateDirectory(Path.GetDirectoryName(logFilePath));
         }
 
         public static void Log(Severity severity, string message)
@@ -46,7 +45,7 @@ namespace AonefilmsBot
 
             sb.Append("\r\n");
 
-            File.AppendAllText(LogFileName, sb.ToString());
+            File.AppendAllText(logFilePath, sb.ToString());
         }
 
         public static void LogMessage(string message)

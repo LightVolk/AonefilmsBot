@@ -60,10 +60,17 @@ namespace AonefilmsBot
         });
 
         /// <summary>
-        /// Inline переключение случайных фильмов
+        /// Inline переключение случайных фильмов.
         /// </summary>
         public static InlineKeyboardMarkup inlineNextRandom = new InlineKeyboardMarkup(new[] {
                 new[] { new InlineKeyboardButton("Следующий фильм →", "Random.txt@0") }
+        });
+
+        /// <summary>
+        /// Inline Дано.
+        /// </summary>
+        public static InlineKeyboardMarkup inlineDano = new InlineKeyboardMarkup(new[] {
+                new[] { new InlineKeyboardButton("Жми дальше →", "Dano.txt@0") }
         });
     }
 }

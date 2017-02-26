@@ -91,20 +91,16 @@ namespace AonefilmsBot
             // Проверка является ли inline переключаемым.
             if(e.CallbackQuery.Data.Contains("@"))
             {
-                Console.WriteLine("Yes");
-
                 CounterHandler handler;
 
                 string[] split = e.CallbackQuery.Data.Split('@');
 
-                var data = split[0];
+                string callbackQueryData = split[0];
 
-                var count = Int16.Parse(split[1]);
+                Int16 count = Int16.Parse(split[1]);
 
-                Console.WriteLine(data + " " + count);
-
-                if(this.counterHandlers.TryGetValue(data, out handler))
-                    handler(user, data, count);
+                if(this.counterHandlers.TryGetValue(callbackQueryData, out handler))
+                    handler(user, callbackQueryData, count);
             }
             else
             {
@@ -177,11 +173,23 @@ namespace AonefilmsBot
         /// </summary>
         /// <param name="chatId">Id чата.</param>
         /// <param name="photo">Ссылка на изображение.</param>
-        public async void SendSticker(long chatId, string photoLink, IReplyMarkup button = null, ParseMode parseMode = ParseMode.Default)
+        public void SendSticker(long chatId, string photoLink, IReplyMarkup button = null, ParseMode parseMode = ParseMode.Default)
         {
-            await this.bot.SendChatActionAsync(chatId, ChatAction.Typing);
+             this.bot.SendChatActionAsync(chatId, ChatAction.Typing);
 
-            await this.bot.SendStickerAsync(chatId, new FileToSend(photoLink));
+             this.bot.SendStickerAsync(chatId, new FileToSend(photoLink));
+        }
+
+        /// <summary>
+        /// Отправить аудио.
+        /// </summary>
+        /// <param name="chatId">Id чата.</param>
+        /// <param name="photo">Ссылка на изображение.</param>
+        public async void SendAudio(long chatId, string audio, int duration, string performer,string title )
+        {
+            await this.bot.SendChatActionAsync(chatId, ChatAction.RecordAudio);
+
+            await this.bot.SendAudioAsync(chatId, audio, duration, performer, title);
         }
     }
 }
